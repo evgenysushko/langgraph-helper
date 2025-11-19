@@ -9,19 +9,19 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s "How do I add persistence?"
+  uv run main.py "How do I add persistence?"
     → Uses defaults: offline mode, map retrieval, no web search
 
-  %(prog)s --mode online "How do I add persistence?"
+  uv run main.py --mode online "How do I add persistence?"
     → Online mode with map retrieval (fetches live docs), no web search
 
-  %(prog)s --mode online --web-search "How do I add persistence?"
+  uv run main.py --mode online --web-search "How do I add persistence?"
     → Online mode with map retrieval + web search enhancement
 
-  %(prog)s --mode online --retrieval mcp "How do I handle errors?"
+  uv run main.py --mode online --retrieval mcp "How do I handle errors?"
     → Online mode with MCP server (live docs from LangChain)
 
-  %(prog)s --mode online --retrieval mcp --web-search "query"
+  uv run main.py --mode online --retrieval mcp --web-search "query"
     → MCP + web search (all features enabled)
 
 Defaults:
