@@ -36,7 +36,7 @@ cp .env.example .env
 
 ### 4. Download Documentation:
 
-For offline mode, pre-download documentation:
+Pre-download documentation:
 
 ```bash
 uv run download_docs.py
@@ -168,6 +168,10 @@ MCP provides direct access to LangChain's documentation infrastructure. No `llms
 Download approach:
 - Pre-download all docs upfront during setup
 - Refresh local files regularly: re-run download script
+
+```bash
+uv run download_docs.py
+```
 
 What is being downloaded:
 - `llms.txt` (resource map) from https://docs.langchain.com/llms.txt
