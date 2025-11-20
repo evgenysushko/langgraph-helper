@@ -26,8 +26,7 @@ class WebSearcher:
             for result in response.get("results", []):
                 results.append(RetrievedDoc(
                     content=result.get("content", ""),
-                    url=result.get("url", ""),
-                    filename=None  # Web results don't have filenames
+                    url=result.get("url", "")
                 ))
 
             return results
