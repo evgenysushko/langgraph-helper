@@ -1,6 +1,14 @@
-"""Pydantic schemas for structured LLM outputs"""
+"""Pydantic schemas for structured LLM outputs and shared data structures"""
 
+from typing import NamedTuple
 from pydantic import BaseModel, Field
+
+
+class RetrievedDoc(NamedTuple):
+    """Retrieved documentation with content and optional metadata."""
+    content: str
+    url: str | None = None
+    filename: str | None = None
 
 
 class DocumentSelection(BaseModel):
