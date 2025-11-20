@@ -50,6 +50,12 @@ class Config:
                 "  Use: --mode online --retrieval mcp"
             )
 
+        if self.web_search_enabled and self.mode == Mode.OFFLINE:
+            errors.append(
+                "Web search requires online mode.\n"
+                "  Use: --mode online --web-search"
+            )
+
         if not self.gemini_api_key:
             errors.append(
                 "Missing GEMINI_API_KEY environment variable.\n"
