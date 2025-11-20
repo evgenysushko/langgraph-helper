@@ -14,6 +14,9 @@ from src.schemas import DocumentSelection, RetrievedDoc
 class MapRetriever(BaseRetriever):
     """Retrieves docs using LLM-based selection from llms.txt documentation map."""
     LLMS_TXT_URL = "https://docs.langchain.com/llms.txt"
+    REQUEST_TIMEOUT = 10
+    DEFAULT_MAX_RETRIES = 3
+    DEFAULT_INITIAL_DELAY = 2.0
 
     DOC_SELECTION_PROMPT = """You are a helpful assistant that selects the most relevant documentation for answering user queries about LangGraph and LangChain.
 
@@ -48,7 +51,7 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
         if self.fetch_live:
             try:
                 print(f"  Fetching llms.txt from {self.LLMS_TXT_URL}...")
-                response = requests.get(self.LLMS_TXT_URL, timeout=10)
+                response = requests.get(self.LLMS_TXT_URL, timeout=self.REQUEST_TIMEOUT)
                 response.raise_for_status()
                 content = response.text
 
@@ -75,10 +78,15 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
     def _call_llm_with_retry(
         self,
         prompt: str,
-        max_retries: int = 3,
-        initial_delay: float = 2.0
+        max_retries: int = None,
+        initial_delay: float = None
     ) -> DocumentSelection:
         """Calls LLM with exponential backoff retry logic for document selection."""
+        if max_retries is None:
+            max_retries = self.DEFAULT_MAX_RETRIES
+        if initial_delay is None:
+            initial_delay = self.DEFAULT_INITIAL_DELAY
+
         delay = initial_delay
 
         for attempt in range(max_retries):
@@ -117,8 +125,6 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
                     print(f"  ✗ LLM call failed after {max_retries} attempts")
                     raise
 
-        raise Exception("Unexpected retry loop exit")
-
     def _url_to_relative_path(self, url: str) -> str:
         """Extracts relative path from URL (e.g., 'https://.../oss/python/intro.md' -> 'oss/python/intro.md')."""
         parsed = urlparse(url)
@@ -137,7 +143,7 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
                     full_url = url
 
                 print(f"  Fetching {relative_path} from {full_url}...")
-                response = requests.get(full_url, timeout=10)
+                response = requests.get(full_url, timeout=self.REQUEST_TIMEOUT)
                 response.raise_for_status()
                 content = response.text
 

@@ -10,6 +10,7 @@ from src.schemas import Answer
 
 class Agent:
     """Orchestrates retrieval, web search, and LLM-based answer generation."""
+    MAX_WEB_RESULTS = 3
 
     ANSWER_GENERATION_PROMPT = """You are a helpful assistant that answers questions about LangGraph and LangChain based on official documentation.
 
@@ -129,7 +130,7 @@ When referencing sources in your answer:
         web_results = []
         if self.config.web_search_enabled and self.searcher:
             print("Searching the web for additional context...")
-            web_results = self.searcher.search(query, max_results=3)
+            web_results = self.searcher.search(query, max_results=self.MAX_WEB_RESULTS)
             if web_results:
                 print(f"  Found {len(web_results)} web results:")
                 for i, result in enumerate(web_results, 1):
