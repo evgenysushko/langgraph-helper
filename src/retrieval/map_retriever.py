@@ -95,7 +95,22 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
                     prompt,
                     generation_config=genai.GenerationConfig(
                         response_mime_type="application/json",
-                        response_schema=DocumentSelection.model_json_schema()
+                        response_schema={
+                            "type": "object",
+                            "properties": {
+                                "urls": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "description": "List of 2-3 most relevant documentation URLs"
+                                },
+                                "reasoning": {
+                                    "type": "string",
+                                    "description": "Why these documents were selected"
+                                }
+                            },
+                            "required": ["urls", "reasoning"]
+                        },
+                        temperature=0
                     )
                 )
 

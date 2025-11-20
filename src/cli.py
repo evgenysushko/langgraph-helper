@@ -11,24 +11,25 @@ def parse_args() -> argparse.Namespace:
         epilog="""
 Examples:
   uv run main.py "How do I add persistence?"
-    → Uses defaults: offline mode, map retrieval, no web search
+    → Uses defaults: offline, map retrieval, simple agent, no web search
 
   uv run main.py --mode online "How do I add persistence?"
-    → Online mode with map retrieval (fetches live docs), no web search
-
-  uv run main.py --mode online --web-search "How do I add persistence?"
-    → Online mode with map retrieval + web search enhancement
+    → Online mode with map retrieval (fetches live docs)
 
   uv run main.py --mode online --retrieval mcp "How do I handle errors?"
     → Online mode with MCP server (live docs from LangChain)
 
-  uv run main.py --mode online --retrieval mcp --web-search "query"
-    → MCP + web search (all features enabled)
+  uv run main.py --mode online --web-search "How do I add persistence?"
+    → Online mode with map retrieval + web search enhancement
+
+  uv run main.py --agent-type langgraph "How do I add persistence?"
+    → Use LangGraph-based agent implementation
 
 Defaults:
-  --mode offline       Local docs only (fast, no network)
+  --mode offline       Local docs only
   --retrieval map      Map-based retrieval using llms.txt
-  No --web-search      Web search disabled (saves API costs)
+  --agent-type simple  Direct orchestration
+  No --web-search      Web search disabled
 
 Environment Variables:
   GEMINI_API_KEY       - Google Gemini API key (required)
@@ -59,6 +60,14 @@ Environment Variables:
     )
 
     parser.add_argument(
+        "--agent-type",
+        type=str,
+        default="simple",
+        choices=["simple", "langgraph"],
+        help="Agent implementation: simple (direct) or langgraph (graph-based). Default: simple"
+    )
+
+    parser.add_argument(
         "query",
         type=str,
         help="Your question about LangGraph or LangChain"
@@ -83,6 +92,7 @@ def main() -> None:
         print(f"Retrieval: {config.retrieval_method.value}")
         if config.web_search_enabled:
             print(f"Web Search: enabled")
+        print(f"Agent: {args.agent_type}")
         print(f"Query: {args.query}")
 
         if config.retrieval_method == RetrievalMethod.MAP:
@@ -98,8 +108,13 @@ def main() -> None:
             from src.retrieval import MCPRetriever
             retriever = MCPRetriever()
 
-        from src.agent import Agent
-        agent = Agent(config, retriever)
+        if args.agent_type == "langgraph":
+            from src.agents import LangGraphAgent
+            agent = LangGraphAgent(config, retriever)
+        else:
+            from src.agents import SimpleAgent
+            agent = SimpleAgent(config, retriever)
+
         agent.answer(args.query)
 
     except KeyboardInterrupt:

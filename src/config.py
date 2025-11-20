@@ -5,6 +5,9 @@ from enum import Enum
 from pathlib import Path
 from dotenv import load_dotenv
 
+GEMINI_MODEL = "gemini-2.5-flash"
+MAX_WEB_RESULTS = 3
+
 class Mode(Enum):
     """Operating modes: OFFLINE (local docs) or ONLINE (fetch live docs)."""
     OFFLINE = "offline"
