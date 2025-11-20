@@ -1,6 +1,7 @@
 """Command-line interface and argument parsing"""
 
 import argparse
+import sys
 from src.config import Config, Mode, RetrievalMethod
 
 def parse_args() -> argparse.Namespace:
@@ -68,37 +69,47 @@ Environment Variables:
 
 def main() -> None:
     """Orchestrates CLI argument parsing, config validation, and agent execution."""
-    args = parse_args()
-    config = Config()
+    try:
+        args = parse_args()
+        config = Config()
 
-    config.mode = Mode[args.mode.upper()]
-    config.retrieval_method = RetrievalMethod[args.retrieval.upper()]
-    config.web_search_enabled = args.web_search
+        config.mode = Mode[args.mode.upper()]
+        config.retrieval_method = RetrievalMethod[args.retrieval.upper()]
+        config.web_search_enabled = args.web_search
 
-    config.validate()
+        config.validate()
 
-    print(f"Mode: {config.mode.value}")
-    print(f"Retrieval: {config.retrieval_method.value}")
-    if config.web_search_enabled:
-        print(f"Web Search: enabled")
-    print(f"Query: {args.query}")
+        print(f"Mode: {config.mode.value}")
+        print(f"Retrieval: {config.retrieval_method.value}")
+        if config.web_search_enabled:
+            print(f"Web Search: enabled")
+        print(f"Query: {args.query}")
 
-    if config.retrieval_method == RetrievalMethod.MAP:
-        from src.retrieval import MapRetriever
-        fetch_live = config.mode == Mode.ONLINE
-        retriever = MapRetriever(
-            llms_txt_path=config.llms_txt_path,
-            docs_dir=config.docs_dir,
-            api_key=config.gemini_api_key,
-            fetch_live=fetch_live
-        )
-    elif config.retrieval_method == RetrievalMethod.MCP:
-        from src.retrieval import MCPRetriever
-        retriever = MCPRetriever()
+        if config.retrieval_method == RetrievalMethod.MAP:
+            from src.retrieval import MapRetriever
+            fetch_live = config.mode == Mode.ONLINE
+            retriever = MapRetriever(
+                llms_txt_path=config.llms_txt_path,
+                docs_dir=config.docs_dir,
+                api_key=config.gemini_api_key,
+                fetch_live=fetch_live
+            )
+        elif config.retrieval_method == RetrievalMethod.MCP:
+            from src.retrieval import MCPRetriever
+            retriever = MCPRetriever()
 
-    from src.agent import Agent
-    agent = Agent(config, retriever)
-    agent.answer(args.query)
+        from src.agent import Agent
+        agent = Agent(config, retriever)
+        agent.answer(args.query)
+
+    except KeyboardInterrupt:
+        print("\n\nInterrupted by user", file=sys.stderr)
+        sys.exit(130)
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"\nError: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

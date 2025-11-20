@@ -116,13 +116,17 @@ When referencing sources in your answer:
         web_results = []
         if self.config.web_search_enabled and self.searcher:
             print("Searching the web for additional context...")
-            web_results = self.searcher.search(query, max_results=self.MAX_WEB_RESULTS)
-            if web_results:
-                print(f"  Found {len(web_results)} web results:")
-                for i, result in enumerate(web_results, 1):
-                    print(f"    [{i}] {result.url}")
-            else:
-                print("  No web results found (continuing with docs only)")
+            try:
+                web_results = self.searcher.search(query, max_results=self.MAX_WEB_RESULTS)
+                if web_results:
+                    print(f"  Found {len(web_results)} web results:")
+                    for i, result in enumerate(web_results, 1):
+                        print(f"    [{i}] {result.url}")
+                else:
+                    print("  No web results found (continuing with docs only)")
+            except Exception as e:
+                print(f"  Warning: Web search failed: {e}")
+                print("  Continuing with local documentation only...")
             print()
 
         print("Generating answer...")
