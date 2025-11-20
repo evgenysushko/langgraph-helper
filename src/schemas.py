@@ -8,7 +8,6 @@ class RetrievedDoc(NamedTuple):
     """Retrieved documentation with content and optional metadata."""
     content: str
     url: str | None = None
-    filename: str | None = None
 
 
 class DocumentSelection(BaseModel):
