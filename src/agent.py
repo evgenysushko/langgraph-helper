@@ -96,21 +96,7 @@ When referencing sources in your answer:
             prompt,
             generation_config=genai.GenerationConfig(
                 response_mime_type="application/json",
-                response_schema={
-                    "type": "object",
-                    "properties": {
-                        "answer": {
-                            "type": "string",
-                            "description": "Comprehensive answer in markdown format"
-                        },
-                        "sources_used": {
-                            "type": "array",
-                            "items": {"type": "integer"},
-                            "description": "List of document numbers (1-indexed) actually used"
-                        }
-                    },
-                    "required": ["answer", "sources_used"]
-                }
+                response_schema=Answer.model_json_schema()
             )
         )
 
