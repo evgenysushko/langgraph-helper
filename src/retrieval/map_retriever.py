@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import google.generativeai as genai
 import requests
 
+from src.config import GEMINI_MODEL
 from src.retrieval.base import BaseRetriever
 from src.schemas import DocumentSelection, RetrievedDoc
 
@@ -42,7 +43,7 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
         self.fetch_live = fetch_live
 
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-2.5-flash")
+        self.model = genai.GenerativeModel(GEMINI_MODEL)
 
         self.llms_txt_content = self._load_llms_txt()
 
@@ -181,6 +182,9 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
 
     def retrieve(self, query: str) -> list[RetrievedDoc]:
         """Retrieves documents by using LLM to select URLs from llms.txt, then fetching content."""
+        if not query or not query.strip():
+            raise ValueError("Query cannot be empty")
+
         print("Retrieving relevant documentation...")
 
         prompt = self.DOC_SELECTION_PROMPT.format(
@@ -195,6 +199,8 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
         print()
 
         retrieved_docs = []
+        failed_urls = []
+
         for url in selection.urls:
             doc = self._fetch_doc(url)
             if doc:
@@ -202,8 +208,18 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
                 if not self.fetch_live:
                     relative_path = self._url_to_relative_path(url)
                     print(f"  ✓ Retrieved: {relative_path}")
+            else:
+                failed_urls.append(url)
+
+        if failed_urls:
+            print(f"\n  ⚠ Failed to retrieve {len(failed_urls)} document(s):")
+            for url in failed_urls:
+                print(f"    - {url}")
 
         if not retrieved_docs:
-            raise Exception("No documents could be retrieved")
+            raise Exception("No documents could be retrieved. All selected documents failed to fetch.")
+
+        if failed_urls:
+            print(f"\n  Continuing with {len(retrieved_docs)} successfully retrieved document(s)\n")
 
         return retrieved_docs

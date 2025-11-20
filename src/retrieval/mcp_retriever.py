@@ -16,6 +16,9 @@ class MCPRetriever(BaseRetriever):
 
     async def _retrieve_async(self, query: str) -> list[RetrievedDoc]:
         """Connects to MCP server, finds search tool, and executes query asynchronously."""
+        if not query or not query.strip():
+            raise ValueError("Query cannot be empty")
+
         print("Retrieving documentation from MCP server...")
 
         try:
