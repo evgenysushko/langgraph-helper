@@ -1,13 +1,7 @@
 """Abstract base class for document retrievers"""
 
 from abc import ABC, abstractmethod
-from typing import NamedTuple
-
-
-class RetrievedDoc(NamedTuple):
-    """Retrieved documentation with content and optional source URL."""
-    content: str
-    url: str | None = None
+from src.schemas import RetrievedDoc
 
 
 class BaseRetriever(ABC):
