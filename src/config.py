@@ -5,21 +5,25 @@ from enum import Enum
 from pathlib import Path
 from dotenv import load_dotenv
 
-GEMINI_MODEL = "gemini-2.5-flash"
-MAX_WEB_RESULTS = 3
 
 class Mode(Enum):
     """Operating modes: OFFLINE (local docs) or ONLINE (fetch live docs)."""
     OFFLINE = "offline"
     ONLINE = "online"
 
+
 class RetrievalMethod(Enum):
     """Document retrieval strategies: MAP (llms.txt) or MCP (MCP server)."""
     MAP = "map"
     MCP = "mcp"
 
+
 class Config:
     """Application configuration with validation for environment variables and file paths."""
+
+    GEMINI_MODEL = "gemini-2.5-flash"
+    MAX_WEB_RESULTS = 3
+
     def __init__(self):
         load_dotenv()
 

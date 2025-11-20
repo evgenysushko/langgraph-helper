@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import google.generativeai as genai
 import requests
 
-from src.config import GEMINI_MODEL
+from src.config import Config
 from src.retrieval.base import BaseRetriever
 from src.schemas import DocumentSelection, RetrievedDoc
 
@@ -43,7 +43,7 @@ IMPORTANT: Return ONLY the JSON object, no other text. Use exactly "urls" (not "
         self.fetch_live = fetch_live
 
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(GEMINI_MODEL)
+        self.model = genai.GenerativeModel(Config.GEMINI_MODEL)
 
         self.llms_txt_content = self._load_llms_txt()
 

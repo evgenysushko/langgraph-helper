@@ -2,7 +2,7 @@
 
 import google.generativeai as genai
 
-from src.config import GEMINI_MODEL
+from src.config import Config
 from src.schemas import Answer, RetrievedDoc
 
 
@@ -34,7 +34,7 @@ Return your response as JSON with:
 def create_model(api_key: str) -> genai.GenerativeModel:
     """Initialize and configure Gemini model"""
     genai.configure(api_key=api_key)
-    return genai.GenerativeModel(GEMINI_MODEL)
+    return genai.GenerativeModel(Config.GEMINI_MODEL)
 
 
 def format_context(docs: list[RetrievedDoc], web_results: list[RetrievedDoc] | None = None) -> str:
